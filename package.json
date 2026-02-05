@@ -1,6 +1,7 @@
 {
   "name": "assignment-2-testing",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -13,7 +14,7 @@
     "moment": "^2.29.4"
   },
   "devDependencies": {
-    "vitest": "^4.0.0",
-    "@vitest/coverage-istanbul": "^4.0.0"
+    "@vitest/coverage-istanbul": "^4.0.0",
+    "vitest": "^4.0.18"
   }
 }
