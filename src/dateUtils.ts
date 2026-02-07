@@ -1,8 +1,8 @@
-import moment from "moment";
+import { add as dateFnsAdd, isBefore, isEqual, isAfter, getYear, getDay, startOfToday  } from "date-fns" ;
 import { DATE_UNIT_TYPES } from "./constants";
 
 export function getCurrentYear(): number {
-  return moment().year();
+  return getYear(startOfToday());
 }
 
 export function add(date: Date, amount: number, type = DATE_UNIT_TYPES.DAYS): Date {
@@ -12,22 +12,33 @@ export function add(date: Date, amount: number, type = DATE_UNIT_TYPES.DAYS): Da
   if (typeof amount !== 'number' || isNaN(amount)) {
     throw new Error('Invalid amount provided');
   }
-  return moment(date).add(amount, type).toDate();
+
+  let duration = {
+    years: DATE_UNIT_TYPES.YEARS == type ? amount : 0,
+    months: DATE_UNIT_TYPES.MONTHS == type ? amount : 0,
+    weeks: DATE_UNIT_TYPES.WEEKS == type ? amount : 0,
+    days: DATE_UNIT_TYPES.DAYS == type ? amount : 0,
+    minutes: DATE_UNIT_TYPES.MINUTES == type ? amount : 0,
+    seconds: DATE_UNIT_TYPES.SECONDS == type ? amount : 0,
+  }
+
+  return dateFnsAdd(date, duration);
 }
 
 export function isWithinRange(date: Date, from: Date, to: Date): boolean {
-  if (moment(from).isAfter(to)) {
+  if (isAfter(from, to)) {
     throw new Error('Invalid range: from date must be before to date');
   }
-  return moment(date).isBetween(from, to);
+
+  return isBefore(date, to) && isAfter(date, from);
 }
 
 export function isDateBefore(date: Date, compareDate: Date): boolean {
-  return moment(date).isBefore(compareDate);
+  return isBefore(date, compareDate);
 }
 
 export function isSameDay(date: Date, compareDate: Date): boolean {
-  return moment(date).isSame(compareDate, 'day');
+  return getDay(date) == getDay(compareDate);
 }
 
 // Simulates fetching holidays from an API
@@ -45,5 +56,5 @@ export async function getHolidays(year: number): Promise<Date[]> {
 
 export async function isHoliday(date: Date): Promise<boolean> {
   const holidays: Date[] = await getHolidays(date.getFullYear());
-  return holidays.some(holiday => isSameDay(date, holiday));
+  return holidays.some(holiday => isEqual(date, holiday));
 }
